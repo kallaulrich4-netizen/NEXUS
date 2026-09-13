@@ -48,3 +48,6 @@ accessible depuis n'importe quel navigateur, téléphone ou ordinateur.
 3. Restreindre la création de plans tarifaires au super-administrateur
 4. Ajouter davantage de modèles graphiques
 5. Déployer avec PostgreSQL plutôt que SQLite
+
+## Branche de test
+Ceci est un test pour apprendre la gestion des branches dans Nexus.
