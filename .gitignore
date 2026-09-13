@@ -1,3 +1,5 @@
 backend/nexus.db
 *.db
 n.envnnode_modules/
+backend/.env
+frontend/node_modules/
