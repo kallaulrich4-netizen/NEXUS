@@ -1,0 +1,36 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html, body, #root {
+    height: 100%;
+  }
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: #1f2540 transparent;
+  }
+  *::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  *::-webkit-scrollbar-thumb {
+    background-color: #1f2540;
+    border-radius: 9999px;
+  }
+}
+
+@layer components {
+  .nexus-card {
+    @apply bg-nexus-surface border border-nexus-border rounded-2xl;
+  }
+  .nexus-btn-primary {
+    @apply bg-nexus-gradient text-white font-medium rounded-xl px-5 py-2.5 hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+  .nexus-btn-secondary {
+    @apply bg-nexus-surface border border-nexus-border text-nexus-text font-medium rounded-xl px-5 py-2.5 hover:bg-nexus-surface-hover transition-colors;
+  }
+  .nexus-input {
+    @apply bg-nexus-bg border border-nexus-border rounded-xl px-4 py-2.5 text-nexus-text placeholder:text-nexus-text-muted focus:outline-none focus:ring-2 focus:ring-nexus-blue/50 transition-shadow;
+  }
+}

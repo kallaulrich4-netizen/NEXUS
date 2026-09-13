@@ -1,0 +1,32 @@
+# Alternative à Docker : lancement du backend Nexus directement via systemd
+# sur un serveur Debian/Linux (sans conteneur).
+#
+# Installation :
+#   sudo cp nexus-backend.service /etc/systemd/system/
+#   sudo systemctl daemon-reload
+#   sudo systemctl enable --now nexus-backend
+#
+# Adaptez User/Group/WorkingDirectory/ExecStart à votre installation réelle.
+
+[Unit]
+Description=Nexus Platform — Backend (FastAPI/Uvicorn)
+After=network.target
+
+[Service]
+Type=simple
+User=nexus
+Group=nexus
+WorkingDirectory=/opt/nexus/backend
+EnvironmentFile=/opt/nexus/backend/.env
+ExecStart=/opt/nexus/backend/venv/bin/uvicorn app.main:app --host 127.0.0.1 --port 8000 --workers 4
+Restart=on-failure
+RestartSec=5
+
+# Durcissement systemd (defense in depth, en plus des mesures applicatives).
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=full
+ProtectHome=true
+
+[Install]
+WantedBy=multi-user.target

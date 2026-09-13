@@ -1,0 +1,55 @@
+# Orchestration de production pour Nexus.
+# Usage : docker compose -f deployment/docker-compose.yml --env-file backend/.env up -d
+#
+# Le frontend est pré-compilé en fichiers statiques (voir deployment/deploy.sh)
+# et servi directement par Nginx : pas de conteneur Node.js en production.
+
+services:
+  backend:
+    build:
+      context: ../backend
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    env_file:
+      - ../backend/.env
+    volumes:
+      # SQLite en fichier local : à remplacer par un volume dédié ou une
+      # vraie base PostgreSQL managée en production (voir DATABASE_URL).
+      - nexus_data:/app/data
+      # Fichiers médias du Studio (images/vidéos importées + vidéos
+      # rendues) : doit être un volume persistant, sans quoi tout est
+      # perdu à chaque redéploiement du conteneur.
+      - nexus_media:/app/media
+    expose:
+      - "8000"
+    healthcheck:
+      test: ["CMD", "python3", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+  nginx:
+    image: nginx:1.27-alpine
+    restart: unless-stopped
+    depends_on:
+      - backend
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
+      - ../frontend/dist:/usr/share/nginx/html:ro
+      - ./certbot/conf:/etc/letsencrypt:ro
+      - ./certbot/www:/var/www/certbot:ro
+
+  # Optionnel mais recommandé dès que Nexus tourne sur plusieurs workers/
+  # instances : remplace le rate-limiter en mémoire (app/core/rate_limit.py)
+  # par un backend partagé. Non branché par défaut — voir le rapport d'audit.
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    profiles: ["with-redis"]
+
+volumes:
+  nexus_data:
+  nexus_media:
